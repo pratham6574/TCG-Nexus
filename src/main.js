@@ -12,33 +12,97 @@ const time = v => v ? new Date(v).toLocaleString([], {month:'short',day:'numeric
 const msleft = v => Math.max(0, new Date(v || 0).getTime() - Date.now());
 const fmt = (ms, hours=false) => { let n=Math.ceil(ms/1000), h=Math.floor(n/3600), m=Math.floor(n%3600/60), s=n%60; return hours ? [h,m,s].map(x=>String(x).padStart(2,'0')).join(':') : [Math.floor(n/60),s].map(x=>String(x).padStart(2,'0')).join(':'); };
 function shell(){ $('#app').innerHTML = `
-<header class="top"><div class="brand"><div class="logo">⏱️</div><div><div class="eyebrow">TCG OPERATIONS / LIVE TEAM DASHBOARD</div><h1>Kaisuki Cooldown <span>Command Center</span></h1><p>Shared drop radar. Private player cooldowns.</p></div></div><div class="userbox" id="userbox"></div></header>
-<div id="notice"></div><section id="auth" class="panel auth"><h2>🔐 Team access</h2><p class="muted">Invite-only access. Ask the workspace admin to approve your account.</p><div class="field"><label>Email</label><input id="email" type="email" autocomplete="email" placeholder="you@example.com"></div><div class="field"><label>Password</label><input id="password" type="password" autocomplete="current-password" placeholder="At least 8 characters"></div><div class="actions"><button class="primary" id="signIn">Sign in</button><button id="signUp">Request account</button></div><p class="muted tiny">Account requests are not granted access automatically. The admin must approve the account.</p></section>
+<header class="site-top"><a class="brand-mark" href="#" aria-label="TCG Nexus home"><span class="brand-symbol">▱</span><span>TCG <b>NEXUS</b></span></a><nav class="top-nav"><a href="#home" data-info="home">Home</a><a href="#about" data-info="about">About</a><a href="#help" data-info="help">Help</a><a href="#contact" data-info="contact">Contact</a></nav><div class="userbox" id="userbox"></div></header>
+<div id="notice" aria-live="polite"></div>
+<section id="auth" class="entry-layout">
+  <div class="entry-story">
+    <div class="story-kicker"><span class="status-dot"></span> PLAY <i>•</i> TRACK <i>•</i> CONNECT <i>•</i> GROW</div>
+    <div class="hero-title">TCG <span>NEXUS</span></div>
+    <h2>Your TCG companion.</h2>
+    <p class="hero-copy">Track cooldowns, share updates with friends, and keep your TCG community in sync — all in one place.</p>
+    <div class="feature-strip">
+      <div class="feature"><span class="feature-icon">◷</span><b>Shared<br>cooldowns</b></div>
+      <div class="feature"><span class="feature-icon">♧</span><b>Community<br>access</b></div>
+      <div class="feature"><span class="feature-icon">⌁</span><b>Real-time<br>sync</b></div>
+      <div class="feature"><span class="feature-icon">◇</span><b>Built for<br>your team</b></div>
+    </div>
+    <div class="quote-card"><span class="quote-mark">“</span><p>A better place to track, share, and play together.</p></div>
+    <div class="art-orbit orbit-one"></div><div class="art-orbit orbit-two"></div><div class="card-art card-art-a"><span>TCG</span><b>✦</b></div><div class="card-art card-art-b"><span>NEXUS</span><b>◇</b></div><div class="card-art card-art-c"><span>COLLECT</span><b>✧</b></div>
+  </div>
+  <div class="auth-side"><div class="auth-card">
+    <div class="auth-tabs" role="tablist" aria-label="Account access"><button type="button" id="tabSignIn" class="auth-tab active" role="tab" aria-selected="true">↪ &nbsp; Log in</button><button type="button" id="tabSignUp" class="auth-tab" role="tab" aria-selected="false">＋ &nbsp; Create account</button></div>
+    <div class="auth-heading"><span class="auth-kicker">WELCOME TO YOUR SPACE</span><h2 id="authTitle">Welcome back</h2><p id="authSubtitle">Log in to continue to TCG Nexus.</p></div>
+    <form id="authForm" class="auth-form">
+      <div class="field"><label for="email">Email address</label><div class="input-wrap"><span class="input-icon">✉</span><input id="email" type="email" autocomplete="email" required placeholder="you@example.com"></div></div>
+      <div class="field"><div class="label-line"><label for="password">Password</label><button type="button" class="text-button" id="forgotPassword">Forgot password?</button></div><div class="input-wrap"><span class="input-icon">▣</span><input id="password" type="password" autocomplete="current-password" minlength="8" required placeholder="Enter your password"><button type="button" class="reveal-button" id="togglePassword" aria-label="Show password">◉</button></div></div>
+      <div id="confirmPasswordField" class="field" hidden><label for="confirmPassword">Confirm password</label><div class="input-wrap"><span class="input-icon">▣</span><input id="confirmPassword" type="password" autocomplete="new-password" minlength="8" placeholder="Enter password again"></div></div>
+      <div class="auth-options"><label class="check-label"><input id="rememberMe" type="checkbox" checked><span class="custom-check"></span> Keep me signed in</label><span class="secure-note"><span>●</span> Secure access</span></div>
+      <button type="submit" class="submit-button" id="authSubmit"><span id="authSubmitText">Log in to Nexus</span><span class="submit-arrow">→</span></button>
+    </form>
+    <div class="auth-divider"><span></span><small>YOUR COMMUNITY, IN SYNC</small><span></span></div>
+    <p class="auth-switch-copy" id="authSwitchCopy">New to TCG Nexus? <button type="button" id="switchSignUp">Create an account</button></p>
+    <p class="auth-legal">By continuing, you agree to use TCG Nexus respectfully. Your personal cooldowns stay tied to your account.</p>
+  </div><div class="auth-footnote"><span class="tiny-shield">◇</span> Your account. Your cooldowns. Your community.</div></div>
+</section>
+<footer class="site-footer" id="siteFooter"><div class="footer-brand"><a class="brand-mark" href="#"><span class="brand-symbol">▱</span><span>TCG <b>NEXUS</b></span></a><p>A companion for TCG players to track, share, and grow together.</p><small>Version 1.1 · Made for the community</small></div><div class="footer-column"><b>Explore</b><a href="#home" data-info="home">Home</a><a href="#about" data-info="about">About Nexus</a><a href="#features" data-info="features">Features</a></div><div class="footer-column"><b>Support</b><a href="#help" data-info="help">Help center</a><a href="#contact" data-info="contact">Contact & access</a><a href="#issue" data-info="issue">Report an issue</a></div><div class="footer-column"><b>Information</b><a href="#privacy" data-info="privacy">Privacy overview</a><a href="#terms" data-info="terms">Terms of use</a><a href="#community" data-info="community">Community guidelines</a></div></footer>
+<div id="infoModal" class="modal-backdrop" hidden><section class="info-modal" role="dialog" aria-modal="true" aria-labelledby="infoTitle"><button type="button" id="closeInfo" class="modal-close" aria-label="Close">×</button><span class="auth-kicker">TCG NEXUS</span><h2 id="infoTitle">About Nexus</h2><div id="infoBody" class="info-body"></div><button type="button" class="submit-button modal-done" id="infoDone">Got it <span class="submit-arrow">→</span></button></section></div>
 <div id="dashboard" hidden>
 <div class="stats"><div class="stat"><small>SHARED CHANNELS</small><strong id="channelCount">0</strong></div><div class="stat"><small>CLAIM COOLDOWN</small><strong>10:00</strong><small>Personal</small></div><div class="stat"><small>/TCG DROP</small><strong>02:00:00</strong><small>Personal</small></div><div class="stat"><small>EARLIEST WINDOWS OPEN</small><strong id="windowCount">0</strong><small>Not a guaranteed drop</small></div></div>
 <div class="grid"><div>
 <section class="panel"><h2>🧍 Your personal cooldowns</h2><div class="coolcard"><div class="between"><b>🃏 Card claim</b><span class="pill" id="claimStatus">READY</span></div><div class="timer" id="claimTimer">00:00</div><p class="muted" id="claimUntil">No active cooldown</p><button class="primary full" id="claimBtn">I claimed a card · start 10m</button></div><div class="coolcard"><div class="between"><b>⌨️ /tcg drop command</b><span class="pill" id="cmdStatus">READY</span></div><div class="timer" id="cmdTimer">00:00:00</div><p class="muted" id="cmdUntil">No active cooldown</p><button class="primary full" id="cmdBtn">I used /tcg drop · start 2h</button></div><p class="muted tiny">These timers belong only to your account. They do not execute or verify commands in Kaisuki.</p></section>
 <section class="panel"><h2>➕ Add / update a server channel</h2><form id="dropForm"><div class="field"><label>Server</label><input id="server" required maxlength="60" placeholder="Blue Lock / One Piece / DBZ / Nika / TCG Main"></div><div class="field"><label>Specific channel</label><input id="channel" required maxlength="80" placeholder="#tcg-drops"></div><div class="field"><label>Last actual drop date & time</label><input id="lastDrop" type="datetime-local" required></div><div class="field"><label>Notes (optional)</label><input id="notes" maxlength="120" placeholder="Useful context for the team"></div><button class="primary full">Publish update to everyone</button></form><p class="hint">Drop may happen after 61+ minutes; activity-based timing is variable. This is an earliest-window reminder, not a prediction.</p></section>
-</div><div><section class="panel"><div class="between"><h2>🌐 Shared server radar</h2><span class="pill live">LIVE SYNC</span></div><div id="channels" class="channelList"></div></section><section class="panel"><h2>🛡️ Access status</h2><p id="accessStatus" class="muted"></p><p class="muted tiny">Approved users share server/channel records. Your claim and command cooldowns remain private to your login.</p></section></div></div></div>`;
+</div><div><section class="panel"><div class="between"><h2>🌐 Shared server radar</h2><span class="pill live">LIVE SYNC</span></div><div id="channels" class="channelList"></div></section><section class="panel"><h2>🛡️ Access status</h2><p id="accessStatus" class="muted"></p><p class="muted tiny">Signed-in users share server/channel records. Your claim and command cooldowns remain private to your login.</p></section></div></div></div>`;
 }
 function notice(msg,kind='info'){ $('#notice').innerHTML=`<div class="notice ${kind}">${html(msg)}</div>`; }
+function setAuthMode(mode){
+ const signup=mode==='signup';
+ $('#tabSignIn').classList.toggle('active',!signup);$('#tabSignUp').classList.toggle('active',signup);
+ $('#tabSignIn').setAttribute('aria-selected',String(!signup));$('#tabSignUp').setAttribute('aria-selected',String(signup));
+ $('#authTitle').textContent=signup?'Create your account':'Welcome back';
+ $('#authSubtitle').textContent=signup?'Join your TCG community and keep everything in sync.':'Log in to continue to TCG Nexus.';
+ $('#authSubmitText').textContent=signup?'Create account':'Log in to Nexus';
+ $('#confirmPasswordField').hidden=!signup;$('#confirmPassword').required=signup;
+ $('#password').autocomplete=signup?'new-password':'current-password';
+ $('#authSwitchCopy').innerHTML=signup?'Already have an account? <button type="button" id="switchSignIn">Log in instead</button>':'New to TCG Nexus? <button type="button" id="switchSignUp">Create an account</button>';
+ const switchButton=$('#switchSignUp')||$('#switchSignIn');if(switchButton)switchButton.onclick=()=>setAuthMode(signup?'signin':'signup');
+}
+const infoContent={
+ home:['Welcome to TCG Nexus','Your shared TCG companion for tracking cooldowns and keeping server updates in sync.'],
+ about:['About TCG Nexus','TCG Nexus helps your group keep track of shared server/channel drop timing and personal cooldown reminders in one place.'],
+ features:['Features','• Shared server and channel records\n• Live updates across signed-in users\n• Personal claim and /tcg drop cooldowns\n• Mobile-friendly access'],
+ help:['Help center','Having trouble signing in? Check that your email and password are correct. If you cannot access the workspace, contact the person who shared the TCG Nexus link with you.'],
+ contact:['Contact & access','For account access or workspace help, contact the person who invited you to use this TCG Nexus workspace. No support email or social account has been configured in this version.'],
+ issue:['Report an issue','If something is not working, note what you clicked, what you expected, and any error message. Share those details with the workspace owner.'],
+ privacy:['Privacy overview','Your account uses Supabase authentication. Shared server/channel records are visible to signed-in users; personal cooldowns are associated with your account. Avoid entering sensitive personal information.'],
+ terms:['Terms of use','Use TCG Nexus respectfully and keep shared drop information accurate. Cooldown windows are reminders, not guarantees that a drop will occur.'],
+ community:['Community guidelines','Be respectful, avoid posting private information, and keep shared records useful and accurate.']
+};
+function openInfo(key){const item=infoContent[key]||infoContent.about;$('#infoTitle').textContent=item[0];$('#infoBody').textContent=item[1];$('#infoModal').hidden=false;}
 async function init(){
  shell();
- if(!configured){ notice('Setup required: add your Supabase project URL and publishable/anon key to the .env file, then deploy. No shared backend is connected yet.','warn'); $('#auth').hidden=false; $('#signIn').disabled=true; $('#signUp').disabled=true; return; }
+ document.querySelectorAll('[data-info]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();openInfo(a.dataset.info)}));
+ $('#closeInfo').onclick=$('#infoDone').onclick=()=>$('#infoModal').hidden=true;
+ $('#infoModal').addEventListener('click',e=>{if(e.target===$('#infoModal'))$('#infoModal').hidden=true});
+ $('#tabSignIn').onclick=()=>setAuthMode('signin');$('#tabSignUp').onclick=()=>setAuthMode('signup');setAuthMode('signin');
+ $('#togglePassword').onclick=()=>{const field=$('#password'),show=field.type==='password';field.type=show?'text':'password';$('#togglePassword').textContent=show?'◎':'◉';$('#togglePassword').setAttribute('aria-label',show?'Hide password':'Show password')};
+ $('#forgotPassword').onclick=async()=>{const email=$('#email').value.trim();if(!email)return notice('Enter your email address first, then choose Forgot password.','warn');if(!configured)return notice('Connect Supabase before resetting a password.','warn');const {error}=await supabase.auth.resetPasswordForEmail(email,{redirectTo:location.origin});if(error)notice(error.message,'warn');else notice('If an account exists for this email, a password-reset link will be sent.','ok')};
+ if(!configured){notice('Setup required: add your Supabase project URL and publishable/anon key to Vercel Environment Variables, then deploy.','warn');$('#authSubmit').disabled=true;return;}
  const {data:{session}}=await supabase.auth.getSession();
- supabase.auth.onAuthStateChange((_event,s)=>{ if(s?.user) loadUser(s.user); else {user=null;profile=null;$('#dashboard').hidden=true;$('#auth').hidden=false;$('#userbox').innerHTML='';} });
- if(session?.user) await loadUser(session.user);
- $('#signIn').onclick=async()=>{let email=$('#email').value.trim(),password=$('#password').value;const {error}=await supabase.auth.signInWithPassword({email,password});if(error)notice(error.message,'warn');};
- $('#signUp').onclick=async()=>{let email=$('#email').value.trim(),password=$('#password').value;if(password.length<8)return notice('Use a password of at least 8 characters.','warn');const {error}=await supabase.auth.signUp({email,password,options:{data:{display_name:email.split('@')[0]}}});if(error)notice(error.message,'warn');else notice('Account request created. Ask the admin to approve your account before using shared data.');};
+ supabase.auth.onAuthStateChange((_event,s)=>{if(s?.user)loadUser(s.user);else{user=null;profile=null;$('#dashboard').hidden=true;$('#auth').hidden=false;$('#userbox').innerHTML='';}});
+ if(session?.user)await loadUser(session.user);
+ $('#authForm').onsubmit=async e=>{e.preventDefault();const email=$('#email').value.trim(),password=$('#password').value,signup=!$('#confirmPasswordField').hidden;
+   if(signup){if(password.length<8)return notice('Use a password of at least 8 characters.','warn');if(password!==$('#confirmPassword').value)return notice('The passwords do not match.','warn');const {data,error}=await supabase.auth.signUp({email,password,options:{data:{display_name:email.split('@')[0]}}});if(error)notice(error.message,'warn');else if(data.session)notice('Account created. You are ready to use TCG Nexus.','ok');else notice('Account created. Check your email if verification is required, then sign in.','ok');}
+   else {const {error}=await supabase.auth.signInWithPassword({email,password});if(error)notice(error.message,'warn');}
+ };
 }
 async function loadUser(u){
  user=u; $('#auth').hidden=true; $('#dashboard').hidden=false; $('#userbox').innerHTML=`<span>${html(u.email)}</span><button id="signOut">Sign out</button>`;$('#signOut').onclick=()=>supabase.auth.signOut();
  const {data:p,error}=await supabase.from('profiles').select('*').eq('id',u.id).maybeSingle();
  if(error){notice('Could not load profile: '+error.message,'warn');return}
  profile=p;
- if(!p?.approved){$('#dashboard').hidden=true;$('#auth').hidden=false;notice('Account created, but access is awaiting admin approval. Ask the admin to approve your account.','warn');return}
- notice('You are signed in. Shared channel updates sync live across approved users.','ok');
- $('#accessStatus').textContent=`Approved account: ${u.email}`;
+ if(!p?.approved){$('#dashboard').hidden=true;$('#auth').hidden=false;notice('This account is not enabled for workspace access yet. Please contact the workspace owner.','warn');return}
+ notice('You are signed in. Shared channel updates sync live across TCG Nexus users.','ok');
+ $('#accessStatus').textContent=`Signed in as: ${u.email}`;
  await Promise.all([loadCooldown(),loadChannels()]);
  if(realtime) supabase.removeChannel(realtime);
  realtime=supabase.channel('shared-server-channels').on('postgres_changes',{event:'*',schema:'public',table:'server_channels'},()=>loadChannels()).subscribe();
