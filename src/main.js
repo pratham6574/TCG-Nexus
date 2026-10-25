@@ -102,6 +102,7 @@ async function init(){
  shell();
  const homeViewSelectors=['.dashboard-welcome','#homeQuicknav','#adminPanel','.dashboard-section-heading','.stats','.grid','.dashboard-bottom-note'];
  function showDashboardView(view){const settings=view==='settings',admin=view==='admin';homeViewSelectors.forEach(sel=>{const el=$(sel);if(el)el.hidden=settings||admin;});$('#cooldownTabs').hidden=settings||admin;$('#profileSettings').hidden=!settings;$('#adminPanel').hidden=!admin||!profile?.is_admin;window.scrollTo({top:0,behavior:'smooth'});}
+ document.addEventListener('tcg-open-admin',()=>showDashboardView('admin'));
  $('#openProfileSettings').onclick=()=>showDashboardView('settings');
  $('#settingsHelp').onclick=()=>openInfo('help'); $('#settingsInfo').onclick=()=>openInfo('about');
  if($('#navProfileSettings'))$('#navProfileSettings').onclick=()=>showDashboardView('settings');
@@ -138,7 +139,7 @@ async function loadUser(u){
  const firstName=(p?.display_name||u.user_metadata?.display_name||u.email?.split("@")[0]||"player").trim().split(/\s+/)[0];
  if($("#welcomeHeading"))$("#welcomeHeading").innerHTML=`Welcome back, <span>${html(firstName)}.</span>`;
  $('#adminPanel').hidden=true;
- const menu=$('.profile-menu-popover'); if(p?.is_admin && menu && !$('#navAdminAccess')){const adminButton=document.createElement('button');adminButton.type='button';adminButton.id='navAdminAccess';adminButton.textContent='Administration';menu.insertBefore(adminButton,$('#navSignOut'));adminButton.onclick=()=>showDashboardView('admin');}
+ const menu=$('.profile-menu-popover'); if(p?.is_admin && menu && !$('#navAdminAccess')){const adminButton=document.createElement('button');adminButton.type='button';adminButton.id='navAdminAccess';adminButton.textContent='Administration';menu.insertBefore(adminButton,$('#navSignOut'));adminButton.onclick=()=>document.dispatchEvent(new Event('tcg-open-admin'));}
  if($('#profileSettings'))$('#profileSettings').hidden=true;
  if($('#personalTab')){ $('#personalCooldowns').hidden=true; $('#sharedRadar').hidden=false; $('#personalTab').hidden=true; $('#sharedTab').hidden=true; $('.access-panel').hidden=true; $('.grid').classList.add('single-focus'); $('#personalTab').classList.remove('active'); $('#sharedTab').classList.add('active'); $('#personalTab').setAttribute('aria-selected','false'); $('#sharedTab').setAttribute('aria-selected','true'); }
  ['.dashboard-welcome','#homeQuicknav','.dashboard-section-heading','.stats','.grid','.dashboard-bottom-note'].forEach(sel=>{const el=$(sel);if(el)el.hidden=false;});
