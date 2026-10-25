@@ -11,6 +11,18 @@ const html = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&l
 const time = v => v ? new Date(v).toLocaleString([], {month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}) : 'Not recorded';
 const msleft = v => Math.max(0, new Date(v || 0).getTime() - Date.now());
 const fmt = (ms, hours=false) => { let n=Math.ceil(ms/1000), h=Math.floor(n/3600), m=Math.floor(n%3600/60), s=n%60; return hours ? [h,m,s].map(x=>String(x).padStart(2,'0')).join(':') : [Math.floor(n/60),s].map(x=>String(x).padStart(2,'0')).join(':'); };
+function authErrorMessage(error, mode='login') {
+ const code = String(error?.code || error?.name || '').toLowerCase();
+ const msg = String(error?.message || '').toLowerCase();
+ if (code.includes('email_not_confirmed') || msg.includes('email not confirmed')) return 'Email verification required. Open the verification link sent to your inbox, then sign in again.';
+ if (code.includes('invalid_credentials') || msg.includes('invalid login credentials')) return 'Email or password is incorrect. Check both and try again.';
+ if (code.includes('user_already_exists') || msg.includes('already registered')) return 'An account with this email already exists. Switch to Log in instead.';
+ if (code.includes('weak_password') || msg.includes('password should be')) return 'Choose a stronger password that meets the password requirements.';
+ if (code.includes('over_request_rate_limit') || code.includes('too_many_requests') || msg.includes('rate limit')) return 'Too many attempts in a short time. Please wait a little and try again.';
+ if (msg.includes('network') || msg.includes('fetch')) return 'Connection problem. Check your internet and try again.';
+ return error?.message || (mode === 'signup' ? 'Account creation failed. Please try again.' : 'Sign-in failed. Please try again.');
+}
+
 function shell(){ $('#app').innerHTML = `
 <header class="site-top"><a class="brand-mark" href="#" aria-label="TCG Nexus home"><span class="brand-symbol">▱</span><span>TCG <b>NEXUS</b></span></a><nav class="top-nav"><a href="#home" data-info="home">Home</a><a href="#about" data-info="about">About</a><a href="#help" data-info="help">Help</a><a href="#contact" data-info="contact">Contact</a></nav><div class="userbox" id="userbox"></div></header>
 <div id="notice" aria-live="polite"></div>
@@ -92,8 +104,8 @@ async function init(){
  supabase.auth.onAuthStateChange((_event,s)=>{if(s?.user)loadUser(s.user);else{user=null;profile=null;$('#dashboard').hidden=true;$('#auth').hidden=false;$('#userbox').innerHTML='';}});
  if(session?.user)await loadUser(session.user);
  $('#authForm').onsubmit=async e=>{e.preventDefault();const email=$('#email').value.trim(),password=$('#password').value,signup=!$('#confirmPasswordField').hidden;
-   if(signup){if(password.length<8)return notice('Use a password of at least 8 characters.','warn');if(password!==$('#confirmPassword').value)return notice('The passwords do not match.','warn');const {data,error}=await supabase.auth.signUp({email,password,options:{data:{display_name:email.split('@')[0]}}});if(error)notice(error.message,'warn');else if(data.session)notice('Account created. Your request is pending owner approval.','ok');else notice('Account created. Verify your email if requested. You can sign in after the owner approves your account.','ok');}
-   else {const {error}=await supabase.auth.signInWithPassword({email,password});if(error)notice(error.message,'warn');}
+   if(signup){if(password.length<8)return notice('Use a password of at least 8 characters.','warn');if(password!==$('#confirmPassword').value)return notice('The passwords do not match.','warn');const {data,error}=await supabase.auth.signUp({email,password,options:{data:{display_name:email.split('@')[0]}}});if(error)notice(authErrorMessage(error,'signup'),'warn');else if(data.session)notice('Account created. Your access is pending owner approval. You can enter after the owner approves your account.','ok');else notice('Account created. Step 1 of 2: verify your email using the link in your inbox. Step 2: wait for the owner to approve your account, then sign in.','ok');}
+   else {const {error}=await supabase.auth.signInWithPassword({email,password});if(error)notice(authErrorMessage(error,'login'),'warn');}
  };
 }
 async function loadUser(u){
@@ -101,7 +113,7 @@ async function loadUser(u){
  const {data:p,error}=await supabase.from('profiles').select('*').eq('id',u.id).maybeSingle();
  if(error){notice('Could not load profile: '+error.message,'warn');return}
  profile=p;
- if(!p?.approved && !p?.is_admin){$('#dashboard').hidden=true;$('#auth').hidden=false;$('#adminPanel').hidden=true;notice('Account created successfully. Your access is pending owner approval. You can sign in here again after approval.','warn');return}
+ if(!p?.approved && !p?.is_admin){$('#dashboard').hidden=true;$('#auth').hidden=false;$('#adminPanel').hidden=true;notice('Access not active yet: your account is waiting for owner approval. Once approved, sign in again to continue.','warn');return}
  $('#auth').hidden=true; $('#dashboard').hidden=false;
  $('#adminPanel').hidden=!p?.is_admin;
  if(p?.is_admin){$('#refreshApprovals').onclick=loadPendingUsers;await loadPendingUsers();}
