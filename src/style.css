@@ -186,3 +186,32 @@ input:focus,select:focus,textarea:focus{border-color:rgba(103,169,255,.75)!impor
  .radar-channel .actions button:first-child{flex-basis:100%}
  .radar-channel .actions button{flex:1}
 }
+
+
+/* Focused product pass: remove redundant navigation, private timers and dashboard admin clutter */
+body:not(.is-authenticated) .site-top .top-nav, body:not(.is-authenticated) .site-top .userbox, body:not(.is-authenticated) .site-footer{display:none!important}
+body.is-authenticated .top-nav-menus{display:none!important}
+body.is-authenticated .site-top{display:flex;align-items:center;justify-content:space-between}
+body.is-authenticated .site-top .userbox{margin-left:auto}
+#personalCooldowns,#personalTab,#sharedTab{display:none!important}
+#adminPanel{display:none!important}
+.dashboard-welcome .welcome-actions [data-jump="personal"], #homeQuicknav [data-jump="personal"]{display:none!important}
+.dashboard-section-heading .dash-subtitle{max-width:45%;text-align:right}
+.profile-menu{position:relative}
+.profile-menu summary{list-style:none;cursor:pointer}
+.profile-menu summary::-webkit-details-marker{display:none}
+.profile-menu-avatar{width:42px;height:42px;display:grid;place-items:center;border-radius:50%;font-weight:800;font-size:13px;color:#f4f8ff;background:linear-gradient(145deg,#4c91ed,#7868e9);border:1px solid rgba(190,216,255,.6);box-shadow:0 0 22px rgba(86,139,246,.25)}
+.profile-menu-popover{position:absolute;z-index:60;right:0;top:calc(100% + 12px);width:240px;padding:9px;border:1px solid rgba(145,177,222,.22);border-radius:16px;background:#0c1422;box-shadow:0 22px 60px rgba(0,0,0,.42);display:grid;gap:3px}
+.profile-menu-identity{display:grid;gap:4px;padding:10px;border-bottom:1px solid rgba(145,177,222,.14);margin-bottom:4px}
+.profile-menu-identity b{font-size:13px;color:#f5f8ff}.profile-menu-identity small{font-size:10px;color:#91a4bf;overflow-wrap:anywhere}
+.profile-menu-popover button{border:0;background:transparent;text-align:left;padding:11px;border-radius:9px;color:#c9d8eb;font:inherit;font-size:12px;cursor:pointer}
+.profile-menu-popover button:hover{background:#17273d;color:#fff}
+#notice .notice{border-radius:12px;padding:11px 15px;box-shadow:0 12px 30px rgba(0,0,0,.18)}
+#adminPanel{margin-top:14px}
+.timer{width:clamp(150px,20vw,210px);height:clamp(150px,20vw,210px);margin:20px auto 16px;display:grid;place-items:center;position:relative;border-radius:50%;font-size:clamp(27px,4vw,38px);font-weight:800;letter-spacing:-1.5px;color:#e8f5ff;background:radial-gradient(circle at 50% 50%,#0b1728 56%,transparent 58%),conic-gradient(from -90deg,#6fe9ff 0deg,#7b75ff 230deg,rgba(77,104,153,.2) 230deg 360deg);box-shadow:0 0 0 1px rgba(121,184,255,.3),0 0 20px rgba(78,163,255,.22),0 0 48px rgba(97,107,255,.14),inset 0 0 25px rgba(82,158,255,.1);font-variant-numeric:tabular-nums}
+.timer:before{content:'';position:absolute;inset:7px;border-radius:50%;border:1px solid rgba(132,194,255,.23);box-shadow:inset 0 0 22px rgba(84,157,255,.08);pointer-events:none}
+.coolcard{padding:22px 18px!important}
+.coolcard .between{align-items:center}
+#profileSettings .panel-heading{align-items:center}
+#profileSettings .settings-card{position:relative}
+@media(max-width:600px){.profile-menu-avatar{width:38px;height:38px}.profile-menu-popover{right:0;width:min(240px,calc(100vw - 32px))}.timer{width:155px;height:155px;font-size:28px}.dashboard-section-heading .dash-subtitle{max-width:100%;text-align:left}}
