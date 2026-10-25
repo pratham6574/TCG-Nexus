@@ -98,7 +98,7 @@ const infoContent={
 };
 function openInfo(key){const item=infoContent[key]||infoContent.about;$('#infoTitle').textContent=item[0];$('#infoBody').textContent=item[1];$('#infoModal').hidden=false;}
 async function showSettingsFromProfile(){const settings=$('#profileSettings'); if(settings){['.dashboard-welcome','#homeQuicknav','#adminPanel','.dashboard-section-heading','.stats','.grid','.dashboard-bottom-note','#cooldownTabs'].forEach(sel=>{const el=$(sel);if(el)el.hidden=true;});settings.hidden=false;window.scrollTo({top:0,behavior:'smooth'});}}
-function init(){
+async function init(){
  shell();
  const homeViewSelectors=['.dashboard-welcome','#homeQuicknav','#adminPanel','.dashboard-section-heading','.stats','.grid','.dashboard-bottom-note'];
  function showDashboardView(view){const settings=view==='settings';homeViewSelectors.forEach(sel=>{const el=$(sel);if(el)el.hidden=settings;});$('#cooldownTabs').hidden=settings;$('#profileSettings').hidden=!settings;window.scrollTo({top:0,behavior:'smooth'});}
