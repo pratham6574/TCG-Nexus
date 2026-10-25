@@ -154,3 +154,35 @@ input:focus,select:focus,textarea:focus{border-color:rgba(103,169,255,.75)!impor
  .site-footer{grid-template-columns:1fr 1fr;gap:22px}
 }
 @media(max-width:390px){.dashboard-quicknav{grid-template-columns:1fr}.stats{grid-template-columns:1fr 1fr}.stat strong{font-size:21px}}
+
+
+/* Product UX pass — radar-first, clear hierarchy, and practical controls */
+.radar-toolbar{display:grid;grid-template-columns:minmax(180px,1fr) minmax(145px,190px) auto;gap:10px;align-items:center;margin:18px 0 10px}
+.radar-search{display:flex;align-items:center;gap:10px;min-width:0;padding:0 13px;border:1px solid var(--line);border-radius:12px;background:rgba(5,11,21,.5);color:var(--muted)}
+.radar-search>span{font-size:23px;line-height:1}
+.radar-search input{width:100%;min-width:0;padding:12px 0;background:transparent;border:0;outline:0!important;box-shadow:none!important;color:var(--white);font-size:13px}
+.radar-search input:focus{outline:0!important;box-shadow:none!important}
+.radar-toolbar select{width:100%;min-width:0;padding:12px;border:1px solid var(--line);border-radius:12px;background:#101b2c;color:var(--white);font-size:12px}
+.radar-toolbar .secondary{min-height:42px;white-space:nowrap}
+.radar-footnote{display:flex;gap:8px;align-items:flex-start;margin:10px 0 18px;padding:11px 13px;border:1px solid rgba(103,169,255,.15);border-radius:12px;background:rgba(60,103,166,.07);font-size:11px;line-height:1.6;color:var(--muted)}
+.radar-footnote span{color:var(--blue2);font-size:15px}
+.radar-channel{position:relative;overflow:hidden}
+.radar-channel:before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:linear-gradient(180deg,rgba(103,169,255,.65),rgba(139,123,255,.12));opacity:.6}
+.radar-channel .actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.radar-channel .actions button{min-height:38px;border-radius:10px;padding:9px 12px;font-size:12px}
+.radar-channel .actions button:first-child{flex:1}
+.dashboard-section-heading{align-items:end}
+.dashboard-section-heading h2,.panel-heading h2{letter-spacing:-.5px}
+.dashboard-quicknav{gap:10px}
+.dashboard-quicknav button,.dashboard-quicknav a{border:1px solid var(--line);border-radius:12px;background:rgba(13,24,40,.75);padding:11px 14px}
+.cooldown-tab{transition:background .2s,border-color .2s,color .2s}
+.cooldown-tab.active{box-shadow:0 6px 22px rgba(74,132,215,.12)}
+.empty{padding:26px 18px;text-align:center;line-height:1.65;border:1px dashed rgba(145,177,222,.22);border-radius:14px;color:var(--muted)}
+@media(max-width:700px){
+ .radar-toolbar{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px}
+ .radar-search{grid-column:1/-1}
+ .radar-toolbar .secondary{min-height:40px}
+ .radar-toolbar select{font-size:12px;padding:11px 8px}
+ .radar-channel .actions button:first-child{flex-basis:100%}
+ .radar-channel .actions button{flex:1}
+}
