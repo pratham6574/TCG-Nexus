@@ -215,3 +215,12 @@ body.is-authenticated .site-top .userbox{margin-left:auto}
 #profileSettings .panel-heading{align-items:center}
 #profileSettings .settings-card{position:relative}
 @media(max-width:600px){.profile-menu-avatar{width:38px;height:38px}.profile-menu-popover{right:0;width:min(240px,calc(100vw - 32px))}.timer{width:155px;height:155px;font-size:28px}.dashboard-section-heading .dash-subtitle{max-width:100%;text-align:left}}
+
+/* Final cleanup: notifications are brief toasts; authenticated support lives in settings. */
+.site-footer{display:none!important}
+#notice .notice{position:relative;padding-right:38px!important;animation:noticeIn .18s ease-out}
+#notice .notice-dismiss{position:absolute;right:9px;top:50%;transform:translateY(-50%);border:0;background:transparent;color:inherit;font-size:20px;line-height:1;padding:4px 7px;opacity:.8}
+#adminPanel{display:block!important}
+#adminPanel[hidden]{display:none!important}
+.settings-help-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+@keyframes noticeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
