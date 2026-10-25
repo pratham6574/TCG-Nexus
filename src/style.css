@@ -224,3 +224,6 @@ body.is-authenticated .site-top .userbox{margin-left:auto}
 #adminPanel[hidden]{display:none!important}
 .settings-help-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
 @keyframes noticeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+
+/* Dark mode is the only supported appearance. */
+body.light-theme{color-scheme:dark!important}
