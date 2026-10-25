@@ -48,3 +48,45 @@ button:focus-visible,a:focus-visible,summary:focus-visible,input:focus-visible{o
 .light-theme .radar-metric small,.light-theme .radar-detail-grid small,.light-theme .radar-explain{color:#64768d}.light-theme .radar-detail-grid>div{background:#f8fbff;border-color:#dce6f1}.light-theme .confidence{background:#fff;color:#2a405b;border-color:#d2deeb}
 @media(max-width:520px){.radar-summary{gap:6px}.radar-metric{gap:6px;padding:9px 7px}.radar-metric-icon{width:26px;height:26px;font-size:14px}.radar-metric small{font-size:7px;letter-spacing:.3px}.radar-metric b{font-size:16px}.radar-detail-grid{grid-template-columns:1fr 1fr}.radar-detail-grid>div:last-child{grid-column:1/-1}.radar-detail-grid b{font-size:12px}.radar-estimate-row{align-items:flex-start}.radar-channel .timer{font-size:27px}}
 @media(prefers-reduced-motion:reduce){:root{scroll-behavior:auto}*,*::before,*::after{transition:none!important;animation:none!important}}
+
+
+/* NEXUS // visual identity refresh */
+:root{--bg:#070b14;--panel:#0c1422;--line:rgba(145,177,222,.17);--muted:#91a4bf;--blue:#67a9ff;--blue2:#9acaff;--accent:#8b7bff;--mint:#73f0d0;--white:#f5f8ff}
+body{background:radial-gradient(ellipse at 12% 8%,rgba(53,104,186,.22),transparent 34%),radial-gradient(ellipse at 88% 22%,rgba(104,74,212,.13),transparent 30%),linear-gradient(180deg,#080d17 0%,#070b13 60%,#090f1b 100%)}
+.site-top{position:sticky;top:0;z-index:30;background:rgba(7,11,20,.82);backdrop-filter:blur(18px);border-bottom-color:rgba(140,173,224,.15)}
+.brand-mark{letter-spacing:-1px}.brand-symbol{background:linear-gradient(145deg,rgba(94,153,238,.2),rgba(139,123,255,.12));border-color:rgba(133,177,243,.48);box-shadow:0 0 24px rgba(76,143,232,.1)}
+.top-nav a,.nav-dropdown summary{font-weight:600;letter-spacing:.01em}
+.nav-dropdown-menu,.auth-card,.panel,.card,.stat-card,.cooldown-card,.radar-card,.quote-card{backdrop-filter:blur(16px)}
+.auth-card{border:1px solid rgba(141,174,222,.2);box-shadow:0 28px 90px rgba(0,0,0,.28),inset 0 1px rgba(255,255,255,.035)}
+button:not(.plain-button){transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease,background .16s ease}
+button:not(:disabled):active{transform:translateY(1px) scale(.99)}
+button.primary,button[type=submit]{box-shadow:0 7px 24px rgba(65,135,225,.17)}
+#notice{position:sticky;top:82px;z-index:40}
+#dashboard{animation:nexusEnter .38s ease both}
+.dashboard-welcome,.radar-summary,.stat-card,.panel,.profile-panel,.cooldown-card{border-color:rgba(145,177,222,.16)}
+.dashboard-welcome{background:radial-gradient(ellipse at 100% 0%,rgba(101,142,236,.13),transparent 42%),linear-gradient(135deg,rgba(16,29,48,.96),rgba(10,18,31,.96))}
+.radar-summary{background:linear-gradient(135deg,rgba(18,33,54,.96),rgba(12,20,34,.96))}
+.status-dot{background:var(--mint);box-shadow:0 0 0 4px rgba(115,240,208,.1),0 0 16px rgba(115,240,208,.38)}
+input,select,textarea{transition:border-color .18s,box-shadow .18s}
+input:focus,select:focus,textarea:focus{border-color:rgba(103,169,255,.75)!important;box-shadow:0 0 0 3px rgba(103,169,255,.1)}
+@keyframes nexusEnter{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:760px){
+ #app{width:min(100% - 28px,1440px)}
+ .site-top{height:auto;min-height:64px;gap:12px;flex-wrap:wrap;padding:12px 0;margin-bottom:16px}
+ .brand-mark{font-size:18px}.brand-symbol{width:31px;height:31px}
+ .top-nav{order:3;width:100%;margin:0;gap:0;justify-content:space-between;overflow:visible}
+ .top-nav>a,.nav-dropdown summary{font-size:12px;padding:9px 4px}
+ .nav-dropdown-menu{z-index:50}
+ .userbox{margin-left:auto}
+ .entry-layout{grid-template-columns:minmax(0,1fr);min-height:auto;padding:10px 0 28px;gap:18px}
+ .entry-story{min-height:0;padding:24px 6px 8px}
+ .hero-title{font-size:clamp(46px,13vw,76px);letter-spacing:-3px}
+ .entry-story>h2{letter-spacing:2px}
+ .feature-strip{margin-top:20px}
+ .quote-card{margin-top:14px}
+ .art-orbit,.card-art{opacity:.25}
+ .auth-side{min-width:0}
+ .auth-card{width:100%;padding:clamp(18px,5vw,28px)}
+ #notice{top:4px}
+}
+@media(prefers-reduced-motion:reduce){#dashboard{animation:none}button,input,select,textarea{transition:none}}
