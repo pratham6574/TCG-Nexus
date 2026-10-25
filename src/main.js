@@ -47,6 +47,7 @@ function shell(){ $('#app').innerHTML = `
 <footer class="site-footer" id="siteFooter"><div class="footer-brand"><a class="brand-mark" href="#"><span class="brand-symbol">▱</span><span>TCG <b>NEXUS</b></span></a><p>A companion for TCG players to track, share, and grow together.</p><small>Version 1.1 · Made for the community</small></div><div class="footer-column"><b>Explore</b><a href="#home" data-info="home">Home</a><a href="#about" data-info="about">About Nexus</a><a href="#features" data-info="features">Features</a></div><div class="footer-column"><b>Support</b><a href="#help" data-info="help">Help center</a><a href="#contact" data-info="contact">Contact & access</a><a href="#issue" data-info="issue">Report an issue</a></div><div class="footer-column"><b>Information</b><a href="#privacy" data-info="privacy">Privacy overview</a><a href="#terms" data-info="terms">Terms of use</a><a href="#community" data-info="community">Community guidelines</a></div></footer>
 <div id="infoModal" class="modal-backdrop" hidden><section class="info-modal" role="dialog" aria-modal="true" aria-labelledby="infoTitle"><button type="button" id="closeInfo" class="modal-close" aria-label="Close">×</button><span class="auth-kicker">TCG NEXUS</span><h2 id="infoTitle">About Nexus</h2><div id="infoBody" class="info-body"></div><button type="button" class="submit-button modal-done" id="infoDone">Got it <span class="submit-arrow">→</span></button></section></div>
 <div id="dashboard" hidden>
+<section id="adminPanel" class="panel admin-panel" hidden><div class="between"><div><span class="auth-kicker">OWNER CONTROL</span><h2>🛡️ Account approvals</h2><p class="muted tiny">Only your admin account can approve new members.</p></div><button class="secondary" id="refreshApprovals" type="button">Refresh list</button></div><div id="pendingUsers" class="pending-list"><p class="muted">Loading requests…</p></div></section>
 <div class="stats"><div class="stat"><small>SHARED CHANNELS</small><strong id="channelCount">0</strong></div><div class="stat"><small>CLAIM COOLDOWN</small><strong>10:00</strong><small>Personal</small></div><div class="stat"><small>/TCG DROP</small><strong>02:00:00</strong><small>Personal</small></div><div class="stat"><small>EARLIEST WINDOWS OPEN</small><strong id="windowCount">0</strong><small>Not a guaranteed drop</small></div></div>
 <div class="grid"><div>
 <section class="panel"><h2>🧍 Your personal cooldowns</h2><div class="coolcard"><div class="between"><b>🃏 Card claim</b><span class="pill" id="claimStatus">READY</span></div><div class="timer" id="claimTimer">00:00</div><p class="muted" id="claimUntil">No active cooldown</p><button class="primary full" id="claimBtn">I claimed a card · start 10m</button></div><div class="coolcard"><div class="between"><b>⌨️ /tcg drop command</b><span class="pill" id="cmdStatus">READY</span></div><div class="timer" id="cmdTimer">00:00:00</div><p class="muted" id="cmdUntil">No active cooldown</p><button class="primary full" id="cmdBtn">I used /tcg drop · start 2h</button></div><p class="muted tiny">These timers belong only to your account. They do not execute or verify commands in Kaisuki.</p></section>
@@ -91,17 +92,20 @@ async function init(){
  supabase.auth.onAuthStateChange((_event,s)=>{if(s?.user)loadUser(s.user);else{user=null;profile=null;$('#dashboard').hidden=true;$('#auth').hidden=false;$('#userbox').innerHTML='';}});
  if(session?.user)await loadUser(session.user);
  $('#authForm').onsubmit=async e=>{e.preventDefault();const email=$('#email').value.trim(),password=$('#password').value,signup=!$('#confirmPasswordField').hidden;
-   if(signup){if(password.length<8)return notice('Use a password of at least 8 characters.','warn');if(password!==$('#confirmPassword').value)return notice('The passwords do not match.','warn');const {data,error}=await supabase.auth.signUp({email,password,options:{data:{display_name:email.split('@')[0]}}});if(error)notice(error.message,'warn');else if(data.session)notice('Account created. You are ready to use TCG Nexus.','ok');else notice('Account created. Check your email if verification is required, then sign in.','ok');}
+   if(signup){if(password.length<8)return notice('Use a password of at least 8 characters.','warn');if(password!==$('#confirmPassword').value)return notice('The passwords do not match.','warn');const {data,error}=await supabase.auth.signUp({email,password,options:{data:{display_name:email.split('@')[0]}}});if(error)notice(error.message,'warn');else if(data.session)notice('Account created. Your request is pending owner approval.','ok');else notice('Account created. Verify your email if requested. You can sign in after the owner approves your account.','ok');}
    else {const {error}=await supabase.auth.signInWithPassword({email,password});if(error)notice(error.message,'warn');}
  };
 }
 async function loadUser(u){
- user=u; $('#auth').hidden=true; $('#dashboard').hidden=false; $('#userbox').innerHTML=`<span>${html(u.email)}</span><button id="signOut">Sign out</button>`;$('#signOut').onclick=()=>supabase.auth.signOut();
+ user=u; $('#userbox').innerHTML=`<span>${html(u.email)}</span><button id="signOut">Sign out</button>`;$('#signOut').onclick=()=>supabase.auth.signOut();
  const {data:p,error}=await supabase.from('profiles').select('*').eq('id',u.id).maybeSingle();
  if(error){notice('Could not load profile: '+error.message,'warn');return}
  profile=p;
- if(!p?.approved){$('#dashboard').hidden=true;$('#auth').hidden=false;notice('This account is not enabled for workspace access yet. Please contact the workspace owner.','warn');return}
- notice('You are signed in. Shared channel updates sync live across TCG Nexus users.','ok');
+ if(!p?.approved && !p?.is_admin){$('#dashboard').hidden=true;$('#auth').hidden=false;$('#adminPanel').hidden=true;notice('Account created successfully. Your access is pending owner approval. You can sign in here again after approval.','warn');return}
+ $('#auth').hidden=true; $('#dashboard').hidden=false;
+ $('#adminPanel').hidden=!p?.is_admin;
+ if(p?.is_admin){$('#refreshApprovals').onclick=loadPendingUsers;await loadPendingUsers();}
+ notice(p?.is_admin?'Welcome, owner. You can approve new accounts below.':'You are signed in. Shared channel updates sync live across TCG Nexus users.','ok');
  $('#accessStatus').textContent=`Signed in as: ${u.email}`;
  await Promise.all([loadCooldown(),loadChannels()]);
  if(realtime) supabase.removeChannel(realtime);
@@ -109,6 +113,15 @@ async function loadUser(u){
  $('#claimBtn').onclick=()=>startCooldown('claim');
  $('#cmdBtn').onclick=()=>startCooldown('command');
  $('#dropForm').onsubmit=saveDrop;
+}
+async function loadPendingUsers(){
+ if(!profile?.is_admin)return;
+ const list=$('#pendingUsers');list.innerHTML='<p class="muted">Loading requests…</p>';
+ const {data,error}=await supabase.from('profiles').select('id,email,display_name,approved,created_at').eq('approved',false).order('created_at',{ascending:true});
+ if(error){list.innerHTML=`<p class="muted">Could not load requests: ${html(error.message)}</p>`;return;}
+ if(!data?.length){list.innerHTML='<div class="empty">No pending accounts. You are all caught up.</div>';return;}
+ list.innerHTML=data.map(x=>`<article class="pending-user"><div><b>${html(x.display_name||'New member')}</b><p>${html(x.email||'Email unavailable')}</p><small>Requested ${html(time(x.created_at))}</small></div><button class="primary approve-btn" data-approve="${html(x.id)}" type="button">Approve</button></article>`).join('');
+ list.querySelectorAll('[data-approve]').forEach(btn=>btn.onclick=async()=>{btn.disabled=true;btn.textContent='Approving…';const {error}=await supabase.from('profiles').update({approved:true}).eq('id',btn.dataset.approve);if(error){notice('Approval failed: '+error.message,'warn');btn.disabled=false;btn.textContent='Approve';return;}notice('Account approved. The user can now access TCG Nexus.','ok');await loadPendingUsers();});
 }
 async function loadCooldown(){const {data,error}=await supabase.from('user_cooldowns').select('*').eq('user_id',user.id).maybeSingle();if(error){notice('Cooldown data error: '+error.message,'warn');return}cooldown=data||{claim_until:null,command_until:null};renderTimers();}
 async function startCooldown(kind){const until=new Date(Date.now()+(kind==='claim'?10*60*1000:2*60*60*1000)).toISOString();const patch={user_id:user.id,updated_at:new Date().toISOString()};patch[kind==='claim'?'claim_until':'command_until']=until;
