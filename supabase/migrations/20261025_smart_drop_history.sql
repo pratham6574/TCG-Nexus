@@ -16,3 +16,11 @@ drop policy if exists "approved users record drop history" on public.drop_events
 create policy "approved users record drop history" on public.drop_events for insert to authenticated
 with check (recorded_by = auth.uid() and exists (select 1 from public.profiles p where p.id = auth.uid() and p.approved = true));
 grant select, insert on public.drop_events to authenticated;
+
+-- Keep event history synchronized to approved clients.
+do $$
+begin
+  if not exists (select 1 from pg_publication_tables where pubname = 'supabase_realtime' and schemaname = 'public' and tablename = 'drop_events') then
+    alter publication supabase_realtime add table public.drop_events;
+  end if;
+end $$;
